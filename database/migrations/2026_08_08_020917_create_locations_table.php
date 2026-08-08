@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); //Modulo de mando, Rover 1
+            $table->string('name'); // Modulo de mando, Rover 1
             $table->string('type'); // Habitable, vehiculo, Exterior, etc
             $table->boolean('is_pressurized')->default(true); // Indica si el lugar es presurizado o no
             $table->timestamps();

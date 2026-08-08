@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name'); // Nombre del recurso, por ejemplo: Oxigeno, Filtro CO2, etc
             $table->string('measurement_unit'); // Unidad de medida, por ejemplo: Litros, Kilogramos, etc
             $table->boolean('is_consumable')->default(true); // Indica si el recurso es consumible o no
-            $table->decimal('critical_threshold', 8, 2);// Alarma critica
+            $table->decimal('critical_threshold', 8, 2); // Alarma critica
             $table->timestamps();
         });
     }
