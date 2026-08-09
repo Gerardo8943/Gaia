@@ -26,10 +26,19 @@
     import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
     import { Badge } from '@/components/ui/badge';
     import { Button } from '@/components/ui/button';
-    import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+    import {
+        Card,
+        CardContent,
+        CardDescription,
+        CardHeader,
+        CardTitle,
+    } from '@/components/ui/card';
     import { Input } from '@/components/ui/input';
     import { Label } from '@/components/ui/label';
-    import { consume as consumeRoute, transfer as transferRoute } from '@/routes/inventory';
+    import {
+        consume as consumeRoute,
+        transfer as transferRoute,
+    } from '@/routes/inventory';
 
     type ResourceDto = {
         id: number;
@@ -73,7 +82,9 @@
         locations: LocationDto[];
     } = $props();
 
-    const capacities = $derived(new Map(telemetry.map((metric) => [metric.name, metric.capacity])));
+    const capacities = $derived(
+        new Map(telemetry.map((metric) => [metric.name, metric.capacity])),
+    );
 
     const resources = $derived([
         ...new Map(
@@ -116,16 +127,22 @@
         {#if criticalStocks.length > 0}
             <Badge variant="destructive" class="animate-pulse">
                 <TriangleAlert class="size-3" />
-                {criticalStocks.length} {criticalStocks.length === 1 ? 'alerta' : 'alertas'}
+                {criticalStocks.length}
+                {criticalStocks.length === 1 ? 'alerta' : 'alertas'}
             </Badge>
         {/if}
     </div>
 
     {#if criticalStocks.length > 0}
-        <section aria-label="Alertas críticas" class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <section
+            aria-label="Alertas críticas"
+            class="grid gap-3 md:grid-cols-2 xl:grid-cols-3"
+        >
             {#each criticalStocks as stock (stock.id)}
                 <Alert
-                    variant={stock.status === 'Critico' ? 'destructive' : 'default'}
+                    variant={stock.status === 'Critico'
+                        ? 'destructive'
+                        : 'default'}
                     class={stock.status === 'Critico'
                         ? 'animate-pulse border-red-500/60 bg-red-500/10'
                         : 'border-amber-500/50 bg-amber-500/10'}
@@ -135,7 +152,8 @@
                         {stock.resource.name} — {stock.location?.name}
                     </AlertTitle>
                     <AlertDescription>
-                        {stock.quantity} {stock.resource.measurement_unit} · umbral
+                        {stock.quantity}
+                        {stock.resource.measurement_unit} · umbral
                         {stock.resource.critical_threshold} · {stock.status}
                     </AlertDescription>
                 </Alert>
@@ -151,7 +169,9 @@
                 capacity={metric.capacity}
                 percentage={metric.percentage}
                 measurementUnit={metric.measurement_unit}
-                gradientClass={metric.name.toLowerCase().includes('agua') ? 'from-sky-400 to-blue-600' : 'from-cyan-400 to-sky-600'}
+                gradientClass={metric.name.toLowerCase().includes('agua')
+                    ? 'from-sky-400 to-blue-600'
+                    : 'from-cyan-400 to-sky-600'}
             >
                 {#snippet icon()}
                     {#if metric.name.toLowerCase().includes('agua')}
@@ -170,46 +190,75 @@
                 <ArrowRightLeft class="size-5" />
                 Transferencia manual
             </CardTitle>
-            <CardDescription>Mueve un recurso entre dos ubicaciones de la base.</CardDescription>
+            <CardDescription
+                >Mueve un recurso entre dos ubicaciones de la base.</CardDescription
+            >
         </CardHeader>
         <CardContent>
-            <form onsubmit={(event) => { event.preventDefault(); submitTransfer(); }} class="grid gap-4 md:grid-cols-4">
+            <form
+                onsubmit={(event) => {
+                    event.preventDefault();
+                    submitTransfer();
+                }}
+                class="grid gap-4 md:grid-cols-4"
+            >
                 <div class="grid gap-2">
                     <Label for="from_location_id">Origen</Label>
-                    <select id="from_location_id" name="from_location_id" bind:value={transferForm.from_location_id} class={selectClass}>
+                    <select
+                        id="from_location_id"
+                        name="from_location_id"
+                        bind:value={transferForm.from_location_id}
+                        class={selectClass}
+                    >
                         <option value="" disabled>Selecciona origen</option>
                         {#each locations as location (location.id)}
                             <option value={location.id}>{location.name}</option>
                         {/each}
                     </select>
                     {#if transferForm.errors.from_location_id}
-                        <p class="text-sm text-red-400">{transferForm.errors.from_location_id}</p>
+                        <p class="text-sm text-red-400">
+                            {transferForm.errors.from_location_id}
+                        </p>
                     {/if}
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="to_location_id">Destino</Label>
-                    <select id="to_location_id" name="to_location_id" bind:value={transferForm.to_location_id} class={selectClass}>
+                    <select
+                        id="to_location_id"
+                        name="to_location_id"
+                        bind:value={transferForm.to_location_id}
+                        class={selectClass}
+                    >
                         <option value="" disabled>Selecciona destino</option>
                         {#each locations as location (location.id)}
                             <option value={location.id}>{location.name}</option>
                         {/each}
                     </select>
                     {#if transferForm.errors.to_location_id}
-                        <p class="text-sm text-red-400">{transferForm.errors.to_location_id}</p>
+                        <p class="text-sm text-red-400">
+                            {transferForm.errors.to_location_id}
+                        </p>
                     {/if}
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="resource_id">Recurso</Label>
-                    <select id="resource_id" name="resource_id" bind:value={transferForm.resource_id} class={selectClass}>
+                    <select
+                        id="resource_id"
+                        name="resource_id"
+                        bind:value={transferForm.resource_id}
+                        class={selectClass}
+                    >
                         <option value="" disabled>Selecciona recurso</option>
                         {#each resources as resource (resource.id)}
                             <option value={resource.id}>{resource.name}</option>
                         {/each}
                     </select>
                     {#if transferForm.errors.resource_id}
-                        <p class="text-sm text-red-400">{transferForm.errors.resource_id}</p>
+                        <p class="text-sm text-red-400">
+                            {transferForm.errors.resource_id}
+                        </p>
                     {/if}
                 </div>
 
@@ -226,21 +275,28 @@
                         class="mt-1"
                     />
                     {#if transferForm.errors.quantity}
-                        <p class="text-sm text-red-400">{transferForm.errors.quantity}</p>
+                        <p class="text-sm text-red-400">
+                            {transferForm.errors.quantity}
+                        </p>
                     {/if}
                 </div>
 
                 <div class="md:col-span-4">
                     <Button type="submit" disabled={transferForm.processing}>
                         <ArrowRightLeft class="size-4" />
-                        {transferForm.processing ? 'Transfiriendo...' : 'Transferir'}
+                        {transferForm.processing
+                            ? 'Transfiriendo...'
+                            : 'Transferir'}
                     </Button>
                 </div>
             </form>
         </CardContent>
     </Card>
 
-    <section aria-label="Stock por ubicación" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <section
+        aria-label="Stock por ubicación"
+        class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+    >
         {#each locations as location (location.id)}
             <Card>
                 <CardHeader>
@@ -250,7 +306,9 @@
                         {#if !location.is_pressurized}
                             <Badge variant="outline">Sin presión</Badge>
                         {/if}
-                        <span class="ms-auto flex items-center gap-1 text-sm font-normal text-muted-foreground">
+                        <span
+                            class="ms-auto flex items-center gap-1 text-sm font-normal text-muted-foreground"
+                        >
                             <Users class="size-4" />
                             {location.occupants}
                         </span>
@@ -259,19 +317,30 @@
                 </CardHeader>
                 <CardContent class="gap-4">
                     {#if location.stocks.length === 0}
-                        <p class="text-sm text-muted-foreground">Sin recursos almacenados.</p>
+                        <p class="text-sm text-muted-foreground">
+                            Sin recursos almacenados.
+                        </p>
                     {:else}
                         {#each location.stocks as stock (stock.id)}
-                            <StockBar {stock} capacity={capacities.get(stock.resource.name) ?? null} />
+                            <StockBar
+                                {stock}
+                                capacity={capacities.get(stock.resource.name) ??
+                                    null}
+                            />
                         {/each}
                     {/if}
 
                     <form
-                        onsubmit={(event) => { event.preventDefault(); simulateConsumption(location.id); }}
+                        onsubmit={(event) => {
+                            event.preventDefault();
+                            simulateConsumption(location.id);
+                        }}
                         class="flex items-end gap-2 border-t pt-4"
                     >
                         <div class="grid gap-2">
-                            <Label for={`hours-${location.id}`}>Simular horas</Label>
+                            <Label for={`hours-${location.id}`}
+                                >Simular horas</Label
+                            >
                             <Input
                                 id={`hours-${location.id}`}
                                 name="hours"
@@ -283,14 +352,22 @@
                                 class="w-36"
                             />
                         </div>
-                        <Button type="submit" variant="outline" disabled={consumeForm.processing}>
+                        <Button
+                            type="submit"
+                            variant="outline"
+                            disabled={consumeForm.processing}
+                        >
                             <Clock3 class="size-4" />
-                            {consumeForm.processing ? 'Simulando...' : 'Simular'}
+                            {consumeForm.processing
+                                ? 'Simulando...'
+                                : 'Simular'}
                         </Button>
                     </form>
 
                     {#if consumeForm.errors.hours}
-                        <p class="text-sm text-red-400">{consumeForm.errors.hours}</p>
+                        <p class="text-sm text-red-400">
+                            {consumeForm.errors.hours}
+                        </p>
                     {/if}
                 </CardContent>
             </Card>

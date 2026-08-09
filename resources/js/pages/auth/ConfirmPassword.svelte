@@ -14,8 +14,8 @@
     } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyConfirmationController';
     import AppHead from '@/components/common/AppHead.svelte';
     import InputError from '@/components/common/InputError.svelte';
-    import PasskeyVerify from '@/components/settings/PasskeyVerify.svelte';
     import PasswordInput from '@/components/common/PasswordInput.svelte';
+    import PasskeyVerify from '@/components/settings/PasskeyVerify.svelte';
     import { Button } from '@/components/ui/button';
     import { Label } from '@/components/ui/label';
     import { Spinner } from '@/components/ui/spinner';

@@ -8,6 +8,7 @@
     import Search from 'lucide-svelte/icons/search';
     import AppLogo from '@/components/branding/AppLogo.svelte';
     import AppLogoIcon from '@/components/branding/AppLogoIcon.svelte';
+    import UserMenuContent from '@/components/common/UserMenuContent.svelte';
     import Breadcrumbs from '@/components/navigation/Breadcrumbs.svelte';
     import {
         Avatar,
@@ -39,7 +40,6 @@
         TooltipProvider,
         TooltipTrigger,
     } from '@/components/ui/tooltip';
-    import UserMenuContent from '@/components/common/UserMenuContent.svelte';
     import { currentUrlState } from '@/lib/currentUrl.svelte';
     import { getInitials } from '@/lib/initials';
     import { toUrl } from '@/lib/utils';

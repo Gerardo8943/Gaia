@@ -18,7 +18,8 @@
     const statusMeta = {
         Optimo: {
             label: 'Optimo',
-            className: 'border-emerald-500/50 bg-emerald-500/15 text-emerald-400',
+            className:
+                'border-emerald-500/50 bg-emerald-500/15 text-emerald-400',
             barClass: 'from-emerald-500 to-emerald-400',
         },
         Bajo: {
@@ -28,7 +29,8 @@
         },
         Critico: {
             label: 'Critico',
-            className: 'border-red-500/60 bg-red-500/20 text-red-400 animate-pulse',
+            className:
+                'border-red-500/60 bg-red-500/20 text-red-400 animate-pulse',
             barClass: 'from-red-600 to-red-500',
         },
     } as const;
@@ -41,9 +43,14 @@
         capacity?: number | null;
     } = $props();
 
-    const meta = $derived(statusMeta[stock.status as keyof typeof statusMeta] ?? statusMeta.Optimo);
+    const meta = $derived(
+        statusMeta[stock.status as keyof typeof statusMeta] ??
+            statusMeta.Optimo,
+    );
     const percentage = $derived(
-        capacity != null && capacity > 0 ? Math.min(100, Math.max(0, (stock.quantity / capacity) * 100)) : null,
+        capacity != null && capacity > 0
+            ? Math.min(100, Math.max(0, (stock.quantity / capacity) * 100))
+            : null,
     );
 </script>
 
@@ -52,16 +59,22 @@
         <span class="text-sm font-medium">{stock.resource.name}</span>
         <div class="flex items-center gap-2">
             <span class="text-sm tabular-nums text-muted-foreground">
-                {stock.quantity} {stock.resource.measurement_unit}
+                {stock.quantity}
+                {stock.resource.measurement_unit}
             </span>
             <Badge class={meta.className}>{meta.label}</Badge>
         </div>
     </div>
 
     {#if percentage !== null}
-        <div class="relative h-3 w-full overflow-hidden rounded-full bg-zinc-900/80 dark:bg-zinc-800/80">
+        <div
+            class="relative h-3 w-full overflow-hidden rounded-full bg-zinc-900/80 dark:bg-zinc-800/80"
+        >
             <div
-                class={cn('absolute inset-y-0 left-0 rounded-full bg-gradient-to-r transition-all duration-700', meta.barClass)}
+                class={cn(
+                    'absolute inset-y-0 left-0 rounded-full bg-gradient-to-r transition-all duration-700',
+                    meta.barClass,
+                )}
                 style={`width: ${percentage}%`}
             ></div>
         </div>

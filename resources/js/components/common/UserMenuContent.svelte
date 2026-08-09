@@ -3,13 +3,13 @@
     import { Link, router } from '@inertiajs/svelte';
     import LogOut from 'lucide-svelte/icons/log-out';
     import Settings from 'lucide-svelte/icons/settings';
+    import UserInfo from '@/components/common/UserInfo.svelte';
     import {
         DropdownMenuGroup,
         DropdownMenuItem,
         DropdownMenuLabel,
         DropdownMenuSeparator,
     } from '@/components/ui/dropdown-menu';
-    import UserInfo from '@/components/common/UserInfo.svelte';
     import { toUrl } from '@/lib/utils';
     import { logout } from '@/routes';
     import { edit } from '@/routes/profile';

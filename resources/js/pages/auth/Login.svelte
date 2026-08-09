@@ -9,9 +9,9 @@
     import { Form } from '@inertiajs/svelte';
     import AppHead from '@/components/common/AppHead.svelte';
     import InputError from '@/components/common/InputError.svelte';
-    import PasskeyVerify from '@/components/settings/PasskeyVerify.svelte';
     import PasswordInput from '@/components/common/PasswordInput.svelte';
     import TextLink from '@/components/common/TextLink.svelte';
+    import PasskeyVerify from '@/components/settings/PasskeyVerify.svelte';
     import { Button } from '@/components/ui/button';
     import { Checkbox } from '@/components/ui/checkbox';
     import { Input } from '@/components/ui/input';
