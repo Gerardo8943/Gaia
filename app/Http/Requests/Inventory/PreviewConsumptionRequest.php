@@ -6,7 +6,7 @@ namespace App\Http\Requests\Inventory;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SimulateConsumptionRequest extends FormRequest
+class PreviewConsumptionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

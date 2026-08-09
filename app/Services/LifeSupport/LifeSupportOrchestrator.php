@@ -21,24 +21,51 @@ final class LifeSupportOrchestrator
     }
 
     /**
-     * Simula el consumo de soporte vital en una ubicación durante un
-     * número de horas, degradando el stock y recalculando su estado.
+     * Proyecta el consumo de soporte vital en una ubicación durante un
+     * número de horas, devolviendo los valores y estados resultantes sin
+     * modificar la base de datos.
+     *
+     * @return list<array{
+     *     resource_name: string,
+     *     measurement_unit: string,
+     *     consumed: float,
+     *     quantity: float,
+     *     projected_quantity: float,
+     *     status: string,
+     *     projected_status: string,
+     * }>
      */
-    public function simulate(Location $location, float $hours): void
+    public function project(Location $location, float $hours): array
     {
         $location->loadMissing('stocks.resource');
 
-        foreach ($this->services as $service) {
-            $stock = $location->stocks
-                ->firstWhere('resource.name', $service->resourceName());
+        return collect($this->services)
+            ->map(function (ResourceConsumptionService $service) use ($location, $hours): ?array {
+                $stock = $location->stocks
+                    ->firstWhere('resource.name', $service->resourceName());
 
-            if ($stock === null) {
-                continue;
-            }
+                if ($stock === null) {
+                    return null;
+                }
 
-            $stock->quantity = max(0.0, $stock->quantity - $service->consumed($location->occupants, $hours));
-            $stock->status = $this->stockStatus->determineStatus($stock->quantity, $stock->resource->critical_threshold);
-            $stock->save();
-        }
+                $consumed = $service->consumed($location->occupants, $hours);
+                $projected = max(0.0, $stock->quantity - $consumed);
+
+                return [
+                    'resource_name' => $stock->resource->name,
+                    'measurement_unit' => $stock->resource->measurement_unit,
+                    'consumed' => $consumed,
+                    'quantity' => $stock->quantity,
+                    'projected_quantity' => $projected,
+                    'status' => $stock->status,
+                    'projected_status' => $this->stockStatus->determineStatus(
+                        $projected,
+                        $stock->resource->critical_threshold,
+                    ),
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
     }
 }

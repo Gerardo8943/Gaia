@@ -19,7 +19,7 @@ test('authenticated users can view the inventory page', function () {
             ->has('locations', 1));
 });
 
-test('consumption degrades oxygen based on occupants and hours', function () {
+test('preview projects consumption without modifying the stock', function () {
     config(['life-support.consumption.oxygen' => 0.5]);
 
     $this->actingAs(User::factory()->create());
@@ -34,12 +34,17 @@ test('consumption degrades oxygen based on occupants and hours', function () {
         'resource_id' => $oxygen,
     ]);
 
-    $this->post(route('inventory.consume', $location), ['hours' => 2]);
+    $this->get(route('inventory.preview', $location).'?hours=2')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Inventory/Index')
+            ->where('projection.hours', 2)
+            ->where('projection.stocks.0.projected_quantity', 96));
 
-    expect($stock->fresh()->quantity)->toBe(96.0);
+    expect($stock->fresh()->quantity)->toBe(100.0);
 });
 
-test('stock quantity never drops below zero', function () {
+test('preview never projects below zero', function () {
     config(['life-support.consumption.oxygen' => 1.0]);
 
     $this->actingAs(User::factory()->create());
@@ -49,17 +54,20 @@ test('stock quantity never drops below zero', function () {
         'name' => 'Oxigeno Liquido',
         'critical_threshold' => 1,
     ]);
-    InventoryStock::factory()->withQuantity(5)->create([
+    $stock = InventoryStock::factory()->withQuantity(5)->create([
         'location_id' => $location,
         'resource_id' => $oxygen,
     ]);
 
-    $this->post(route('inventory.consume', $location), ['hours' => 48]);
+    $this->get(route('inventory.preview', $location).'?hours=48')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('projection.stocks.0.projected_quantity', 0));
 
-    expect(InventoryStock::first()->quantity)->toBe(0.0);
+    expect($stock->fresh()->quantity)->toBe(5.0);
 });
 
-test('stock status becomes critical when below the threshold', function () {
+test('preview shows a critical projected status without persisting it', function () {
     $this->actingAs(User::factory()->create());
 
     $location = Location::factory()->withOccupants(1)->create();
@@ -67,21 +75,24 @@ test('stock status becomes critical when below the threshold', function () {
         'name' => 'Oxigeno Liquido',
         'critical_threshold' => 100,
     ]);
-    InventoryStock::factory()->withQuantity(100)->create([
+    $stock = InventoryStock::factory()->withQuantity(100)->create([
         'location_id' => $location,
         'resource_id' => $oxygen,
     ]);
 
-    $this->post(route('inventory.consume', $location), ['hours' => 1]);
+    $this->get(route('inventory.preview', $location).'?hours=1')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('projection.stocks.0.projected_status', InventoryStock::STATUS_CRITICAL));
 
-    expect(InventoryStock::first()->status)->toBe(InventoryStock::STATUS_CRITICAL);
+    expect($stock->fresh()->status)->toBe(InventoryStock::STATUS_OPTIMAL);
 });
 
-test('consumption requires a valid number of hours', function () {
+test('preview requires a valid number of hours', function () {
     $this->actingAs(User::factory()->create());
 
     $location = Location::factory()->create();
 
-    $this->post(route('inventory.consume', $location), ['hours' => 'abc'])
+    $this->get(route('inventory.preview', $location).'?hours=abc')
         ->assertSessionHasErrors('hours');
 });

@@ -7,6 +7,7 @@ namespace App\Services\Inventory;
 use App\Models\InventoryStock;
 use App\Models\Location;
 use App\Models\Resource;
+use App\Models\TransferLog;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 
@@ -54,6 +55,14 @@ final class StockTransferService
             $destination->quantity += $quantity;
             $destination->status = $this->stockStatus->determineStatus($destination->quantity, $resource->critical_threshold);
             $destination->save();
+
+            TransferLog::create([
+                'from_location_id' => $from->id,
+                'to_location_id' => $to->id,
+                'resource_id' => $resource->id,
+                'quantity' => $quantity,
+                'user_id' => auth()->id(),
+            ]);
         });
     }
 }

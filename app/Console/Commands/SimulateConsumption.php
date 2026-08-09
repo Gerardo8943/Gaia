@@ -11,7 +11,7 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 #[Signature('gaia:simulate-consumption {location} {hours}')]
-#[Description('Simula el consumo de soporte vital en una ubicación durante un número de horas')]
+#[Description('Proyecta el consumo de soporte vital en una ubicación durante un número de horas sin modificar datos')]
 class SimulateConsumption extends Command
 {
     /**
@@ -29,25 +29,21 @@ class SimulateConsumption extends Command
 
         $hours = (float) $this->argument('hours');
 
-        $before = $location->stocks()
-            ->with('resource')
-            ->get()
-            ->mapWithKeys(fn ($stock) => [$stock->resource->name => $stock->quantity]);
-
-        $orchestrator->simulate($location, $hours);
-
-        $rows = $location->stocks()
-            ->with('resource')
-            ->get()
-            ->map(fn ($stock) => [
-                'Recurso' => $stock->resource->name,
-                'Antes' => $before[$stock->resource->name] ?? '-',
-                'Despues' => $stock->quantity,
-                'Estado' => $stock->status,
+        $rows = collect($orchestrator->project($location, $hours))
+            ->map(fn (array $projection): array => [
+                'Recurso' => $projection['resource_name'],
+                'Actual' => $projection['quantity'],
+                'Proyectado' => $projection['projected_quantity'],
+                'Estado actual' => $projection['status'],
+                'Estado proyectado' => $projection['projected_status'],
             ]);
 
-        $this->info(sprintf('Consumo simulado para %s durante %.2f horas:', $location->name, $hours));
-        $this->table(['Recurso', 'Antes', 'Despues', 'Estado'], $rows);
+        $this->info(sprintf(
+            'Prevision de consumo para %s durante %.2f horas (no modifica datos):',
+            $location->name,
+            $hours,
+        ));
+        $this->table(['Recurso', 'Actual', 'Proyectado', 'Estado actual', 'Estado proyectado'], $rows);
 
         return self::SUCCESS;
     }

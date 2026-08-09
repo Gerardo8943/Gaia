@@ -12,14 +12,16 @@
 </script>
 
 <script lang="ts">
-    import { useForm } from '@inertiajs/svelte';
+    import { Link, useForm } from '@inertiajs/svelte';
     import ArrowRightLeft from 'lucide-svelte/icons/arrow-right-left';
     import Boxes from 'lucide-svelte/icons/boxes';
     import Clock3 from 'lucide-svelte/icons/clock-3';
     import Droplets from 'lucide-svelte/icons/droplets';
+    import History from 'lucide-svelte/icons/history';
     import TriangleAlert from 'lucide-svelte/icons/triangle-alert';
     import Users from 'lucide-svelte/icons/users';
     import Wind from 'lucide-svelte/icons/wind';
+    import X from 'lucide-svelte/icons/x';
     import AppHead from '@/components/common/AppHead.svelte';
     import StockBar from '@/components/inventory/StockBar.svelte';
     import TelemetryBar from '@/components/inventory/TelemetryBar.svelte';
@@ -35,8 +37,10 @@
     } from '@/components/ui/card';
     import { Input } from '@/components/ui/input';
     import { Label } from '@/components/ui/label';
+    import { toUrl } from '@/lib/utils';
     import {
-        consume as consumeRoute,
+        history as historyRoute,
+        preview as previewRoute,
         transfer as transferRoute,
     } from '@/routes/inventory';
 
@@ -72,14 +76,32 @@
         percentage: number;
     };
 
+    type ProjectionStockDto = {
+        resource_name: string;
+        measurement_unit: string;
+        consumed: number;
+        quantity: number;
+        projected_quantity: number;
+        status: string;
+        projected_status: string;
+    };
+
+    type ProjectionDto = {
+        location: { id: number; name: string };
+        hours: number;
+        stocks: ProjectionStockDto[];
+    };
+
     let {
         telemetry,
         criticalStocks,
         locations,
+        projection = null,
     }: {
         telemetry: TelemetryDto[];
         criticalStocks: StockDto[];
         locations: LocationDto[];
+        projection?: ProjectionDto | null;
     } = $props();
 
     const capacities = $derived(
@@ -101,7 +123,7 @@
         quantity: '',
     });
 
-    const consumeForm = useForm({ hours: '' });
+    const previewForm = useForm({ hours: '' });
 
     const selectClass =
         'dark:bg-zinc-950 mt-1 block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]';
@@ -112,9 +134,11 @@
         });
     }
 
-    function simulateConsumption(locationId: number): void {
-        consumeForm.post(consumeRoute(locationId).url, {
-            onSuccess: () => consumeForm.reset(),
+    function runPreview(locationId: number): void {
+        previewForm.get(previewRoute(locationId).url, {
+            preserveScroll: true,
+            only: ['projection'],
+            onSuccess: () => previewForm.reset(),
         });
     }
 </script>
@@ -122,16 +146,98 @@
 <AppHead title="Inventario" />
 
 <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto p-4">
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between gap-4">
         <h1 class="text-xl font-semibold">Telemetría de la base</h1>
-        {#if criticalStocks.length > 0}
-            <Badge variant="destructive" class="animate-pulse">
-                <TriangleAlert class="size-3" />
-                {criticalStocks.length}
-                {criticalStocks.length === 1 ? 'alerta' : 'alertas'}
-            </Badge>
-        {/if}
+        <div class="flex items-center gap-2">
+            {#if criticalStocks.length > 0}
+                <Badge variant="destructive" class="animate-pulse">
+                    <TriangleAlert class="size-3" />
+                    {criticalStocks.length}
+                    {criticalStocks.length === 1 ? 'alerta' : 'alertas'}
+                </Badge>
+            {/if}
+            <Button variant="outline" size="sm" asChild>
+                <Link href={toUrl(historyRoute())}>
+                    <History class="size-4" />
+                    Historial
+                </Link>
+            </Button>
+        </div>
     </div>
+
+    {#if projection}
+        <section
+            aria-label="Previsión de consumo"
+            class="grid gap-4 rounded-xl border border-border bg-card p-5 shadow-sm"
+        >
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <Clock3 class="size-5 text-muted-foreground" />
+                    <h2 class="text-base font-semibold">
+                        Previsión para {projection.location.name}
+                    </h2>
+                    <Badge variant="outline">
+                        {projection.hours}h simuladas
+                    </Badge>
+                </div>
+                <Link
+                    href={inventoryIndex().url}
+                    class="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    <X class="size-4" />
+                    Descartar
+                </Link>
+            </div>
+
+            <p class="text-sm text-muted-foreground">
+                Esta previsión no modifica los datos: muestra cómo quedaría el
+                stock de soporte vital si la base consumiera durante
+                {projection.hours}h.
+            </p>
+
+            {#if projection.stocks.length === 0}
+                <p class="text-sm text-muted-foreground">
+                    Esta ubicación no tiene recursos de soporte vital.
+                </p>
+            {:else}
+                <div class="grid gap-3 md:grid-cols-2">
+                    {#each projection.stocks as stock (stock.resource_name)}
+                        <div
+                            class="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-3"
+                        >
+                            <div class="flex flex-col gap-1">
+                                <span class="text-sm font-medium"
+                                    >{stock.resource_name}</span
+                                >
+                                <span class="text-sm text-muted-foreground">
+                                    {stock.quantity} → {stock.projected_quantity}
+                                    {stock.measurement_unit}
+                                </span>
+                            </div>
+                            <div class="flex flex-col items-end gap-1">
+                                <Badge
+                                    variant="outline"
+                                    class={stock.projected_status === 'Critico'
+                                        ? 'border-red-500/60 bg-red-500/15 text-red-400'
+                                        : stock.projected_status === 'Bajo'
+                                          ? 'border-amber-500/50 bg-amber-500/15 text-amber-400'
+                                          : 'border-emerald-500/50 bg-emerald-500/15 text-emerald-400'}
+                                >
+                                    {stock.status} → {stock.projected_status}
+                                </Badge>
+                                {#if stock.consumed > 0}
+                                    <span class="text-xs text-muted-foreground"
+                                        >−{stock.consumed}
+                                        {stock.measurement_unit}</span
+                                    >
+                                {/if}
+                            </div>
+                        </div>
+                    {/each}
+                </div>
+            {/if}
+        </section>
+    {/if}
 
     {#if criticalStocks.length > 0}
         <section
@@ -333,7 +439,7 @@
                     <form
                         onsubmit={(event) => {
                             event.preventDefault();
-                            simulateConsumption(location.id);
+                            runPreview(location.id);
                         }}
                         class="flex items-end gap-2 border-t pt-4"
                     >
@@ -347,7 +453,7 @@
                                 type="number"
                                 min="0.01"
                                 step="0.1"
-                                bind:value={consumeForm.hours}
+                                bind:value={previewForm.hours}
                                 placeholder="Ej: 24"
                                 class="w-36"
                             />
@@ -355,18 +461,18 @@
                         <Button
                             type="submit"
                             variant="outline"
-                            disabled={consumeForm.processing}
+                            disabled={previewForm.processing}
                         >
                             <Clock3 class="size-4" />
-                            {consumeForm.processing
-                                ? 'Simulando...'
+                            {previewForm.processing
+                                ? 'Calculando...'
                                 : 'Simular'}
                         </Button>
                     </form>
 
-                    {#if consumeForm.errors.hours}
+                    {#if previewForm.errors.hours}
                         <p class="text-sm text-red-400">
-                            {consumeForm.errors.hours}
+                            {previewForm.errors.hours}
                         </p>
                     {/if}
                 </CardContent>
