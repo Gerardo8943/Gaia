@@ -8,8 +8,8 @@
 
 <script lang="ts">
     import { Form } from '@inertiajs/svelte';
-    import AppHead from '@/components/AppHead.svelte';
-    import TextLink from '@/components/TextLink.svelte';
+    import AppHead from '@/components/common/AppHead.svelte';
+    import TextLink from '@/components/common/TextLink.svelte';
     import { Button } from '@/components/ui/button';
     import { Spinner } from '@/components/ui/spinner';
     import { logout } from '@/routes';

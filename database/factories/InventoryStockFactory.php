@@ -33,4 +33,9 @@ class InventoryStockFactory extends Factory
     {
         return $this->state(fn (): array => ['quantity' => $quantity]);
     }
+
+    public function withStatus(string $status): static
+    {
+        return $this->state(fn (): array => ['status' => $status]);
+    }
 }

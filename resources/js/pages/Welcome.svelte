@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Link, page } from '@inertiajs/svelte';
-    import AppHead from '@/components/AppHead.svelte';
+    import AppHead from '@/components/common/AppHead.svelte';
     import { toUrl } from '@/lib/utils';
     import { dashboard, login } from '@/routes';
     import { register } from '@/routes';

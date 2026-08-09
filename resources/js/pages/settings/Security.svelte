@@ -14,13 +14,13 @@
 <script lang="ts">
     import { Form, page } from '@inertiajs/svelte';
     import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
-    import AppHead from '@/components/AppHead.svelte';
-    import Heading from '@/components/Heading.svelte';
-    import InputError from '@/components/InputError.svelte';
-    import ManagePasskeys from '@/components/ManagePasskeys.svelte';
-    import type { Props as ManagePasskeysProps } from '@/components/ManagePasskeys.svelte';
-    import ManageTwoFactor from '@/components/ManageTwoFactor.svelte';
-    import PasswordInput from '@/components/PasswordInput.svelte';
+    import AppHead from '@/components/common/AppHead.svelte';
+    import Heading from '@/components/common/Heading.svelte';
+    import InputError from '@/components/common/InputError.svelte';
+    import ManagePasskeys from '@/components/settings/ManagePasskeys.svelte';
+    import type { Props as ManagePasskeysProps } from '@/components/settings/ManagePasskeys.svelte';
+    import ManageTwoFactor from '@/components/settings/ManageTwoFactor.svelte';
+    import PasswordInput from '@/components/common/PasswordInput.svelte';
     import { Button } from '@/components/ui/button';
     import { Label } from '@/components/ui/label';
     const canManageTwoFactor = $derived(Boolean(page.props.canManageTwoFactor));

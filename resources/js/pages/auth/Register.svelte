@@ -7,10 +7,10 @@
 
 <script lang="ts">
     import { Form } from '@inertiajs/svelte';
-    import AppHead from '@/components/AppHead.svelte';
-    import InputError from '@/components/InputError.svelte';
-    import PasswordInput from '@/components/PasswordInput.svelte';
-    import TextLink from '@/components/TextLink.svelte';
+    import AppHead from '@/components/common/AppHead.svelte';
+    import InputError from '@/components/common/InputError.svelte';
+    import PasswordInput from '@/components/common/PasswordInput.svelte';
+    import TextLink from '@/components/common/TextLink.svelte';
     import { Button } from '@/components/ui/button';
     import { Input } from '@/components/ui/input';
     import { Label } from '@/components/ui/label';

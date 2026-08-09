@@ -10,4 +10,11 @@ return [
         'critical' => 1.0, // quantity <= threshold * critical => Critico
         'low' => 2.0, // quantity <= threshold * low => Bajo
     ],
+
+    'telemetry' => [
+        'capacities' => [
+            'Oxigeno Liquido' => 10000,
+            'Agua almacenada' => 5000,
+        ],
+    ],
 ];

@@ -12,9 +12,9 @@
 </script>
 
 <script lang="ts">
-    import AppearanceTabs from '@/components/AppearanceTabs.svelte';
-    import AppHead from '@/components/AppHead.svelte';
-    import Heading from '@/components/Heading.svelte';
+    import AppearanceTabs from '@/components/settings/AppearanceTabs.svelte';
+    import AppHead from '@/components/common/AppHead.svelte';
+    import Heading from '@/components/common/Heading.svelte';
 </script>
 
 <AppHead title="Appearance settings" />

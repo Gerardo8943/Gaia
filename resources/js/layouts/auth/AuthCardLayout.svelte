@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Link } from '@inertiajs/svelte';
     import type { Snippet } from 'svelte';
-    import AppLogoIcon from '@/components/AppLogoIcon.svelte';
+    import AppLogoIcon from '@/components/branding/AppLogoIcon.svelte';
     import {
         Card,
         CardContent,

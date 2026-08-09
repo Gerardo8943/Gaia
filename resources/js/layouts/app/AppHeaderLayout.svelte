@@ -1,8 +1,8 @@
 <script lang="ts">
     import type { Snippet } from 'svelte';
-    import AppContent from '@/components/AppContent.svelte';
-    import AppHeader from '@/components/AppHeader.svelte';
-    import AppShell from '@/components/AppShell.svelte';
+    import AppContent from '@/components/layout/AppContent.svelte';
+    import AppHeader from '@/components/layout/AppHeader.svelte';
+    import AppShell from '@/components/layout/AppShell.svelte';
     import { Toaster } from '@/components/ui/sonner';
     import type { BreadcrumbItem } from '@/types';
 
