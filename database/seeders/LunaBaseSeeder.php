@@ -20,18 +20,21 @@ class LunaBaseSeeder extends Seeder
             'name' => 'Modulo de Mando',
             'type' => 'Habitable',
             'is_pressurized' => true,
+            'occupants' => 4,
         ]);
 
         $rover = Location::create([
             'name' => 'Rover de exploracion',
             'type' => 'Vehiculo',
             'is_pressurized' => false,
+            'occupants' => 1,
         ]);
 
         $exterior = Location::create([
             'name' => 'Almacen de Superficie',
             'type' => 'Exterior',
             'is_pressurized' => false,
+            'occupants' => 0,
         ]);
 
         // Crear recursos
