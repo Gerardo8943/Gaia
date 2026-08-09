@@ -31,7 +31,7 @@ final class TelemetryService
 
             return [
                 'name' => $name,
-                'measurement_unit' => $group->first()?->measurement_unit ?? '',
+                'measurement_unit' => (string) ($group->first()->measurement_unit ?? ''),
                 'quantity' => (float) $group->sum('total'),
                 'capacity' => (float) $capacity,
                 'percentage' => $this->percentage((float) $group->sum('total'), (float) $capacity),
