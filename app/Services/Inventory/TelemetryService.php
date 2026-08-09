@@ -14,7 +14,7 @@ final class TelemetryService
     /**
      * Global levels per tracked resource: total quantity, capacity and percentage.
      *
-     * @return list<array{name: string, measurement_unit: string, quantity: float, capacity: float, percentage: float}>
+     * @return array<int, array{name: string, measurement_unit: string, quantity: float, capacity: float, percentage: float}>
      */
     public function globalLevels(): array
     {
