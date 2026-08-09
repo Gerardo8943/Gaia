@@ -22,7 +22,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property Location $locationFrom
  * @property Location $locationTo
- * @property resource $resource
+ * @property \App\Models\Resource $resource
  * @property User|null $user
  */
 #[Fillable(['from_location_id', 'to_location_id', 'resource_id', 'quantity', 'user_id'])]
@@ -61,7 +61,7 @@ class TransferLog extends Model
     /**
      * Get the transferred resource.
      *
-     * @return BelongsTo<resource, $this>
+     * @return BelongsTo<\App\Models\Resource, $this>
      */
     public function resource(): BelongsTo
     {

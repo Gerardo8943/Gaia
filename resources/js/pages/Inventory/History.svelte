@@ -90,16 +90,22 @@
     </div>
 
     {#if logs.total === 0}
-        <div class="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border p-10">
+        <div
+            class="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border p-10"
+        >
             <p class="text-sm text-muted-foreground">
                 Todavía no hay transferencias registradas.
             </p>
         </div>
     {:else}
-        <div class="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+        <div
+            class="overflow-hidden rounded-xl border border-border bg-card shadow-sm"
+        >
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
-                    <thead class="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
+                    <thead
+                        class="border-b border-border text-xs uppercase tracking-wide text-muted-foreground"
+                    >
                         <tr>
                             <th class="px-4 py-3 font-medium">Fecha</th>
                             <th class="px-4 py-3 font-medium">Recurso</th>
@@ -111,7 +117,9 @@
                     <tbody class="divide-y divide-border">
                         {#each logs.data as log (log.id)}
                             <tr class="transition-colors hover:bg-muted/50">
-                                <td class="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                                <td
+                                    class="whitespace-nowrap px-4 py-3 text-muted-foreground"
+                                >
                                     {formatDate(log.created_at)}
                                 </td>
                                 <td class="px-4 py-3 font-medium">
@@ -124,7 +132,9 @@
                                     >
                                     <span>{log.location_to?.name}</span>
                                 </td>
-                                <td class="whitespace-nowrap px-4 py-3 tabular-nums">
+                                <td
+                                    class="whitespace-nowrap px-4 py-3 tabular-nums"
+                                >
                                     {log.quantity}
                                     {log.resource.measurement_unit}
                                 </td>

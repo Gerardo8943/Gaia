@@ -25,7 +25,7 @@ final class LifeSupportOrchestrator
      * número de horas, devolviendo los valores y estados resultantes sin
      * modificar la base de datos.
      *
-     * @return list<array{
+     * @return array<int, array{
      *     resource_name: string,
      *     measurement_unit: string,
      *     consumed: float,

@@ -57,6 +57,8 @@ class DashboardController extends Controller
 
     /**
      * Find the global percentage for a named resource.
+     *
+     * @param  array<int, array{name: string, measurement_unit: string, quantity: float, capacity: float, percentage: float}>  $globalLevels
      */
     private function percentageFor(array $globalLevels, string $name): float
     {

@@ -177,7 +177,9 @@
                 )}
             >
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    <span
+                        class="text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                    >
                         {card.label}
                     </span>
                     <card.icon
@@ -218,7 +220,8 @@
                         {stock.resource.name} — {stock.location?.name}
                     </AlertTitle>
                     <AlertDescription>
-                        {stock.quantity} {stock.resource.measurement_unit} ·
+                        {stock.quantity}
+                        {stock.resource.measurement_unit} ·
                         {stock.status}
                     </AlertDescription>
                 </Alert>
@@ -276,7 +279,9 @@
                             </p>
                         {:else}
                             {#each entry.stocks as stock (stock.resource_name)}
-                                <div class="flex items-center justify-between gap-3">
+                                <div
+                                    class="flex items-center justify-between gap-3"
+                                >
                                     <div class="flex flex-col">
                                         <span class="text-sm font-medium">
                                             {stock.resource_name}
@@ -289,10 +294,14 @@
                                         </span>
                                     </div>
                                     <div class="flex flex-col items-end gap-1">
-                                        <Badge class={statusClass(stock.status)}>
+                                        <Badge
+                                            class={statusClass(stock.status)}
+                                        >
                                             {stock.status}
                                         </Badge>
-                                        <span class="text-xs text-muted-foreground">
+                                        <span
+                                            class="text-xs text-muted-foreground"
+                                        >
                                             {formatAutonomy(stock.hours)}
                                         </span>
                                     </div>

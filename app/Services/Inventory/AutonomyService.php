@@ -20,7 +20,7 @@ final class AutonomyService
      * Estimated hours of autonomy for each consumable stock at a location,
      * based on the current occupants and consumption rates.
      *
-     * @return list<array{
+     * @return array<int, array{
      *     resource_name: string,
      *     measurement_unit: string,
      *     quantity: float,
