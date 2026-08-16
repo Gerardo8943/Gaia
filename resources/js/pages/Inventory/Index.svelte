@@ -144,7 +144,8 @@
         const num = parseFloat(value);
 
         if (!value || isNaN(num) || num <= 0) {
-            previewErrors[locationId] = 'Ingresa un número de horas válido (> 0).';
+            previewErrors[locationId] =
+                'Ingresa un número de horas válido (> 0).';
 
             return;
         }
@@ -199,7 +200,10 @@
                     <h2 class="text-base font-semibold text-sky-200">
                         Previsión de Soporte Vital: {projection.location.name}
                     </h2>
-                    <Badge variant="outline" class="border-sky-400/50 bg-sky-500/10 text-sky-300">
+                    <Badge
+                        variant="outline"
+                        class="border-sky-400/50 bg-sky-500/10 text-sky-300"
+                    >
                         {projection.hours}h simuladas
                     </Badge>
                 </div>
@@ -213,7 +217,8 @@
             </div>
 
             <p class="text-sm text-muted-foreground">
-                Proyección en tiempo real del impacto de soporte vital consumido durante {projection.hours} horas por los ocupantes activos.
+                Proyección en tiempo real del impacto de soporte vital consumido
+                durante {projection.hours} horas por los ocupantes activos.
             </p>
 
             {#if projection.stocks.length === 0}
@@ -230,8 +235,13 @@
                                 <span class="text-sm font-medium"
                                     >{stock.resource_name}</span
                                 >
-                                <span class="text-sm tabular-nums text-muted-foreground">
-                                    {stock.quantity} → <strong class="text-foreground">{stock.projected_quantity}</strong>
+                                <span
+                                    class="text-sm tabular-nums text-muted-foreground"
+                                >
+                                    {stock.quantity} →
+                                    <strong class="text-foreground"
+                                        >{stock.projected_quantity}</strong
+                                    >
                                     {stock.measurement_unit}
                                 </span>
                                 {#if stock.projected_hours_left !== undefined && stock.projected_hours_left !== null}
@@ -252,7 +262,8 @@
                                     {stock.status} → {stock.projected_status}
                                 </Badge>
                                 {#if stock.consumed > 0}
-                                    <span class="text-xs text-muted-foreground tabular-nums"
+                                    <span
+                                        class="text-xs text-muted-foreground tabular-nums"
                                         >−{stock.consumed}
                                         {stock.measurement_unit}</span
                                     >
@@ -303,18 +314,28 @@
                 measurementUnit={metric.measurement_unit}
                 gradientClass={metric.name.toLowerCase().includes('agua')
                     ? 'from-sky-400 to-blue-600'
-                    : metric.name.toLowerCase().includes('comida') || metric.name.toLowerCase().includes('raciones')
+                    : metric.name.toLowerCase().includes('comida') ||
+                        metric.name.toLowerCase().includes('raciones')
                       ? 'from-amber-400 to-orange-600'
-                      : metric.name.toLowerCase().includes('energia') || metric.name.toLowerCase().includes('bateria')
+                      : metric.name.toLowerCase().includes('energia') ||
+                          metric.name.toLowerCase().includes('bateria')
                         ? 'from-yellow-400 to-amber-500'
                         : 'from-cyan-400 to-sky-600'}
             >
                 {#snippet icon()}
                     {#if metric.name.toLowerCase().includes('agua')}
                         <Droplets class="size-5 text-sky-400" />
-                    {:else if metric.name.toLowerCase().includes('comida') || metric.name.toLowerCase().includes('raciones')}
+                    {:else if metric.name
+                        .toLowerCase()
+                        .includes('comida') || metric.name
+                            .toLowerCase()
+                            .includes('raciones')}
                         <Utensils class="size-5 text-amber-400" />
-                    {:else if metric.name.toLowerCase().includes('energia') || metric.name.toLowerCase().includes('bateria')}
+                    {:else if metric.name
+                        .toLowerCase()
+                        .includes('energia') || metric.name
+                            .toLowerCase()
+                            .includes('bateria')}
                         <Zap class="size-5 text-yellow-400" />
                     {:else}
                         <Wind class="size-5 text-cyan-400" />
