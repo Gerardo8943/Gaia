@@ -4,6 +4,8 @@ return [
     'consumption' => [
         'oxygen' => 0.84, // Litros por astronauta por hora
         'water' => 2.50, // Litros por astronauta por hora
+        'food' => 0.12, // Raciones por astronauta por hora (~2.88 raciones/día)
+        'energy' => 0.50, // kWh por astronauta por hora
     ],
 
     'status' => [
@@ -15,6 +17,8 @@ return [
         'capacities' => [
             'Oxigeno Liquido' => 10000,
             'Agua almacenada' => 5000,
+            'Raciones de Comida' => 2000,
+            'Energia de Baterias' => 3000,
         ],
     ],
 ];

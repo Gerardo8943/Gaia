@@ -6,6 +6,8 @@ namespace App\Services\Inventory;
 
 use App\Models\InventoryStock;
 use App\Models\Location;
+use App\Services\LifeSupport\EnergyConsumptionService;
+use App\Services\LifeSupport\FoodConsumptionService;
 use App\Services\LifeSupport\OxygenConsumptionService;
 use App\Services\LifeSupport\WaterManagementService;
 
@@ -14,6 +16,8 @@ final class AutonomyService
     public function __construct(
         private readonly OxygenConsumptionService $oxygen,
         private readonly WaterManagementService $water,
+        private readonly FoodConsumptionService $food,
+        private readonly EnergyConsumptionService $energy,
     ) {}
 
     /**
@@ -35,13 +39,15 @@ final class AutonomyService
         $rates = [
             $this->oxygen->resourceName() => $this->oxygen->ratePerPersonPerHour(),
             $this->water->resourceName() => $this->water->ratePerPersonPerHour(),
+            $this->food->resourceName() => $this->food->ratePerPersonPerHour(),
+            $this->energy->resourceName() => $this->energy->ratePerPersonPerHour(),
         ];
 
         return $location->stocks
             ->filter(fn (InventoryStock $stock): bool => $stock->resource->is_consumable)
             ->map(function (InventoryStock $stock) use ($rates, $location): array {
                 $rate = $rates[$stock->resource->name] ?? null;
-                $hours = ($rate !== null && $location->occupants > 0)
+                $hours = ($rate !== null && $rate > 0 && $location->occupants > 0)
                     ? $stock->quantity / ($rate * $location->occupants)
                     : null;
 

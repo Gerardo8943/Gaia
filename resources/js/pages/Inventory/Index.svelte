@@ -12,7 +12,7 @@
 </script>
 
 <script lang="ts">
-    import { Link, useForm } from '@inertiajs/svelte';
+    import { Link, router, useForm } from '@inertiajs/svelte';
     import ArrowRightLeft from 'lucide-svelte/icons/arrow-right-left';
     import Boxes from 'lucide-svelte/icons/boxes';
     import Clock3 from 'lucide-svelte/icons/clock-3';
@@ -20,8 +20,10 @@
     import History from 'lucide-svelte/icons/history';
     import TriangleAlert from 'lucide-svelte/icons/triangle-alert';
     import Users from 'lucide-svelte/icons/users';
+    import Utensils from 'lucide-svelte/icons/utensils';
     import Wind from 'lucide-svelte/icons/wind';
     import X from 'lucide-svelte/icons/x';
+    import Zap from 'lucide-svelte/icons/zap';
     import AppHead from '@/components/common/AppHead.svelte';
     import StockBar from '@/components/inventory/StockBar.svelte';
     import TelemetryBar from '@/components/inventory/TelemetryBar.svelte';
@@ -84,6 +86,7 @@
         projected_quantity: number;
         status: string;
         projected_status: string;
+        projected_hours_left?: number | null;
     };
 
     type ProjectionDto = {
@@ -123,7 +126,9 @@
         quantity: '',
     });
 
-    const previewForm = useForm({ hours: '' });
+    let previewHours = $state<Record<number, string>>({});
+    let previewErrors = $state<Record<number, string>>({});
+    let previewLoadingId = $state<number | null>(null);
 
     const selectClass =
         'dark:bg-zinc-950 mt-1 block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]';
@@ -135,11 +140,28 @@
     }
 
     function runPreview(locationId: number): void {
-        previewForm.get(previewRoute(locationId).url, {
-            preserveScroll: true,
-            only: ['projection'],
-            onSuccess: () => previewForm.reset(),
-        });
+        const value = previewHours[locationId];
+        const num = parseFloat(value);
+
+        if (!value || isNaN(num) || num <= 0) {
+            previewErrors[locationId] = 'Ingresa un número de horas válido (> 0).';
+            return;
+        }
+
+        delete previewErrors[locationId];
+        previewLoadingId = locationId;
+
+        router.get(
+            previewRoute(locationId).url,
+            { hours: value },
+            {
+                preserveScroll: true,
+                only: ['projection'],
+                onFinish: () => {
+                    previewLoadingId = null;
+                },
+            },
+        );
     }
 </script>
 
@@ -168,15 +190,15 @@
     {#if projection}
         <section
             aria-label="Previsión de consumo"
-            class="grid gap-4 rounded-xl border border-border bg-card p-5 shadow-sm"
+            class="grid gap-4 rounded-xl border border-sky-500/40 bg-sky-950/20 p-5 shadow-sm dark:border-sky-500/30"
         >
             <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center gap-2">
-                    <Clock3 class="size-5 text-muted-foreground" />
-                    <h2 class="text-base font-semibold">
-                        Previsión para {projection.location.name}
+                    <Clock3 class="size-5 text-sky-400" />
+                    <h2 class="text-base font-semibold text-sky-200">
+                        Previsión de Soporte Vital: {projection.location.name}
                     </h2>
-                    <Badge variant="outline">
+                    <Badge variant="outline" class="border-sky-400/50 bg-sky-500/10 text-sky-300">
                         {projection.hours}h simuladas
                     </Badge>
                 </div>
@@ -190,29 +212,32 @@
             </div>
 
             <p class="text-sm text-muted-foreground">
-                Esta previsión no modifica los datos: muestra cómo quedaría el
-                stock de soporte vital si la base consumiera durante
-                {projection.hours}h.
+                Proyección en tiempo real del impacto de soporte vital consumido durante {projection.hours} horas por los ocupantes activos.
             </p>
 
             {#if projection.stocks.length === 0}
                 <p class="text-sm text-muted-foreground">
-                    Esta ubicación no tiene recursos de soporte vital.
+                    Esta ubicación no posee recursos consumibles registrados.
                 </p>
             {:else}
                 <div class="grid gap-3 md:grid-cols-2">
                     {#each projection.stocks as stock (stock.resource_name)}
                         <div
-                            class="flex items-center justify-between gap-3 rounded-lg border border-border px-4 py-3"
+                            class="flex items-center justify-between gap-3 rounded-lg border border-border bg-card/60 px-4 py-3"
                         >
                             <div class="flex flex-col gap-1">
                                 <span class="text-sm font-medium"
                                     >{stock.resource_name}</span
                                 >
-                                <span class="text-sm text-muted-foreground">
-                                    {stock.quantity} → {stock.projected_quantity}
+                                <span class="text-sm tabular-nums text-muted-foreground">
+                                    {stock.quantity} → <strong class="text-foreground">{stock.projected_quantity}</strong>
                                     {stock.measurement_unit}
                                 </span>
+                                {#if stock.projected_hours_left !== undefined && stock.projected_hours_left !== null}
+                                    <span class="text-xs text-sky-400">
+                                        Autonomía restante: {stock.projected_hours_left}h
+                                    </span>
+                                {/if}
                             </div>
                             <div class="flex flex-col items-end gap-1">
                                 <Badge
@@ -226,7 +251,7 @@
                                     {stock.status} → {stock.projected_status}
                                 </Badge>
                                 {#if stock.consumed > 0}
-                                    <span class="text-xs text-muted-foreground"
+                                    <span class="text-xs text-muted-foreground tabular-nums"
                                         >−{stock.consumed}
                                         {stock.measurement_unit}</span
                                     >
@@ -277,13 +302,21 @@
                 measurementUnit={metric.measurement_unit}
                 gradientClass={metric.name.toLowerCase().includes('agua')
                     ? 'from-sky-400 to-blue-600'
-                    : 'from-cyan-400 to-sky-600'}
+                    : metric.name.toLowerCase().includes('comida') || metric.name.toLowerCase().includes('raciones')
+                      ? 'from-amber-400 to-orange-600'
+                      : metric.name.toLowerCase().includes('energia') || metric.name.toLowerCase().includes('bateria')
+                        ? 'from-yellow-400 to-amber-500'
+                        : 'from-cyan-400 to-sky-600'}
             >
                 {#snippet icon()}
                     {#if metric.name.toLowerCase().includes('agua')}
-                        <Droplets class="size-5 text-muted-foreground" />
+                        <Droplets class="size-5 text-sky-400" />
+                    {:else if metric.name.toLowerCase().includes('comida') || metric.name.toLowerCase().includes('raciones')}
+                        <Utensils class="size-5 text-amber-400" />
+                    {:else if metric.name.toLowerCase().includes('energia') || metric.name.toLowerCase().includes('bateria')}
+                        <Zap class="size-5 text-yellow-400" />
                     {:else}
-                        <Wind class="size-5 text-muted-foreground" />
+                        <Wind class="size-5 text-cyan-400" />
                     {/if}
                 {/snippet}
             </TelemetryBar>
@@ -441,40 +474,42 @@
                             event.preventDefault();
                             runPreview(location.id);
                         }}
-                        class="flex items-end gap-2 border-t pt-4"
+                        class="flex flex-col gap-2 border-t pt-4"
                     >
-                        <div class="grid gap-2">
-                            <Label for={`hours-${location.id}`}
-                                >Simular horas</Label
+                        <div class="flex items-end gap-2">
+                            <div class="grid gap-1.5 flex-1">
+                                <Label for={`hours-${location.id}`}
+                                    >Simular horas de consumo</Label
+                                >
+                                <Input
+                                    id={`hours-${location.id}`}
+                                    name="hours"
+                                    type="number"
+                                    min="0.01"
+                                    step="0.1"
+                                    bind:value={previewHours[location.id]}
+                                    placeholder="Ej: 24"
+                                    class="w-full"
+                                />
+                            </div>
+                            <Button
+                                type="submit"
+                                variant="outline"
+                                disabled={previewLoadingId === location.id}
                             >
-                            <Input
-                                id={`hours-${location.id}`}
-                                name="hours"
-                                type="number"
-                                min="0.01"
-                                step="0.1"
-                                bind:value={previewForm.hours}
-                                placeholder="Ej: 24"
-                                class="w-36"
-                            />
+                                <Clock3 class="size-4" />
+                                {previewLoadingId === location.id
+                                    ? 'Calculando...'
+                                    : 'Simular'}
+                            </Button>
                         </div>
-                        <Button
-                            type="submit"
-                            variant="outline"
-                            disabled={previewForm.processing}
-                        >
-                            <Clock3 class="size-4" />
-                            {previewForm.processing
-                                ? 'Calculando...'
-                                : 'Simular'}
-                        </Button>
-                    </form>
 
-                    {#if previewForm.errors.hours}
-                        <p class="text-sm text-red-400">
-                            {previewForm.errors.hours}
-                        </p>
-                    {/if}
+                        {#if previewErrors[location.id]}
+                            <p class="text-xs text-red-400">
+                                {previewErrors[location.id]}
+                            </p>
+                        {/if}
+                    </form>
                 </CardContent>
             </Card>
         {/each}

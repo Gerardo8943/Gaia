@@ -61,6 +61,24 @@ class LunaBaseSeeder extends Seeder
             ],
         );
 
+        $comida = Resource::updateOrCreate(
+            ['name' => 'Raciones de Comida'],
+            [
+                'measurement_unit' => 'Paquetes',
+                'is_consumable' => true,
+                'critical_threshold' => 200.00,
+            ],
+        );
+
+        $energia = Resource::updateOrCreate(
+            ['name' => 'Energia de Baterias'],
+            [
+                'measurement_unit' => 'kWh',
+                'is_consumable' => true,
+                'critical_threshold' => 300.00,
+            ],
+        );
+
         $traje = Resource::updateOrCreate(
             ['name' => 'Traje Espacial Eva'],
             [
@@ -82,8 +100,23 @@ class LunaBaseSeeder extends Seeder
         );
 
         InventoryStock::updateOrCreate(
+            ['location_id' => $moduloMando->id, 'resource_id' => $comida->id],
+            ['quantity' => 800, 'status' => 'Optimo'],
+        );
+
+        InventoryStock::updateOrCreate(
+            ['location_id' => $moduloMando->id, 'resource_id' => $energia->id],
+            ['quantity' => 1500, 'status' => 'Optimo'],
+        );
+
+        InventoryStock::updateOrCreate(
             ['location_id' => $rover->id, 'resource_id' => $oxigeno->id],
             ['quantity' => 200, 'status' => 'Optimo'],
+        );
+
+        InventoryStock::updateOrCreate(
+            ['location_id' => $rover->id, 'resource_id' => $comida->id],
+            ['quantity' => 50, 'status' => 'Optimo'],
         );
 
         InventoryStock::updateOrCreate(

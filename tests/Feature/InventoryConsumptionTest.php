@@ -96,3 +96,41 @@ test('preview requires a valid number of hours', function () {
     $this->get(route('inventory.preview', $location).'?hours=abc')
         ->assertSessionHasErrors('hours');
 });
+
+test('preview projects food and energy consumption along with oxygen and water', function () {
+    config([
+        'life-support.consumption.oxygen' => 0.5,
+        'life-support.consumption.food' => 0.2,
+        'life-support.consumption.energy' => 1.0,
+    ]);
+
+    $this->actingAs(User::factory()->create());
+
+    $location = Location::factory()->withOccupants(2)->create();
+    $food = Resource::factory()->create([
+        'name' => 'Raciones de Comida',
+        'is_consumable' => true,
+        'critical_threshold' => 10,
+    ]);
+    $energy = Resource::factory()->create([
+        'name' => 'Energia de Baterias',
+        'is_consumable' => true,
+        'critical_threshold' => 20,
+    ]);
+
+    InventoryStock::factory()->withQuantity(100)->create([
+        'location_id' => $location,
+        'resource_id' => $food,
+    ]);
+    InventoryStock::factory()->withQuantity(100)->create([
+        'location_id' => $location,
+        'resource_id' => $energy,
+    ]);
+
+    $this->get(route('inventory.preview', $location).'?hours=10')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('projection.hours', 10)
+            ->where('projection.stocks.0.projected_quantity', 96) // 100 - (0.2 * 2 * 10) = 96
+            ->where('projection.stocks.1.projected_quantity', 80)); // 100 - (1.0 * 2 * 10) = 80
+});
