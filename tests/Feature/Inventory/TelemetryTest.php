@@ -6,7 +6,9 @@ use App\Models\Resource;
 use App\Models\User;
 
 test('inventory page exposes global telemetry levels and critical stocks', function () {
-    config(['inertia.testing.ensure_pages_exist' => false]);
+    config([
+        'inertia.testing.ensure_pages_exist' => false,
+    ]);
 
     $this->actingAs(User::factory()->create());
 
@@ -20,11 +22,15 @@ test('inventory page exposes global telemetry levels and critical stocks', funct
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('Inventory/Index')
-            ->has('telemetry', 2)
+            ->has('telemetry', 4)
             ->where('telemetry.0.name', 'Agua almacenada')
             ->where('telemetry.0.percentage', 20)
-            ->where('telemetry.1.name', 'Oxigeno Liquido')
-            ->where('telemetry.1.percentage', 25)
+            ->where('telemetry.1.name', 'Energia de Baterias')
+            ->where('telemetry.1.percentage', 0)
+            ->where('telemetry.2.name', 'Oxigeno Liquido')
+            ->where('telemetry.2.percentage', 25)
+            ->where('telemetry.3.name', 'Raciones de Comida')
+            ->where('telemetry.3.percentage', 0)
             ->has('criticalStocks', 0)
             ->has('locations', 1));
 });
