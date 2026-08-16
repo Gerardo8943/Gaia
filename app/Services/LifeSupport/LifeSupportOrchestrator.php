@@ -48,7 +48,7 @@ final class LifeSupportOrchestrator
 
         return $location->stocks
             ->filter(fn (InventoryStock $stock): bool => $stock->resource->is_consumable)
-            ->map(function (InventoryStock $stock) use ($registeredServices, $location, $hours): ?array {
+            ->map(function (InventoryStock $stock) use ($registeredServices, $location, $hours): array {
                 $service = $registeredServices->get($stock->resource->name);
 
                 $rate = $service?->ratePerPersonPerHour() ?? 0.0;
