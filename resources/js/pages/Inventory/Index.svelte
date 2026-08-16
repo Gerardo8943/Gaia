@@ -145,6 +145,7 @@
 
         if (!value || isNaN(num) || num <= 0) {
             previewErrors[locationId] = 'Ingresa un número de horas válido (> 0).';
+
             return;
         }
 
